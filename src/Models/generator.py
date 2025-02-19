@@ -1,15 +1,17 @@
-from utils import *
+from .utils import *
 
 class Generator(nnx.Module):
 	def __init__(self, in_features, kernel_size, maxpool_size, stride, padding, rngs, training: bool = True):
 		"""
-		:param in_features:
-		:param kernel_size:
-		:param maxpool_size:
-		:param stride:
-		:param padding:
-		:param rngs:
-		:param training:
+		Initialize the U-Net style Generator
+		Args:
+			in_features (int): Number of input channels
+			kernel_size (tuple): Size of the convolutional kernel
+			maxpool_size (tuple): Size of the maxpooling window
+			stride (tuple): Stride for convolution operations
+			padding (str): Padding type for convolutions ('SAME' or 'VALID')
+			rngs (nnx.Rngs): Random number generators for initialization
+			training (bool, optional): Whether in training mode. Defaults to True
 		"""
 		self.downsample_1 = DownSample(in_features, 64, kernel_size, maxpool_size, stride, padding, rngs, training)
 		self.downsample_2 = DownSample(64, 128, kernel_size, maxpool_size, stride, padding, rngs, training)
@@ -33,6 +35,15 @@ class Generator(nnx.Module):
 		)
 
 	def __call__(self, x, training: bool = True):
+		"""
+		Forward pass through the generator
+		Args:
+			x (Array): Input tensor
+			training (bool, optional): Whether in training mode. Defaults to True
+
+		Returns:
+			Array: Generated output after sigmoid activation
+		"""
 		x1_residual_connection, x1 = self.downsample_1(x, training)
 		x2_residual_connection, x2 = self.downsample_2(x1_residual_connection, training)
 		x3_residual_connection, x3 = self.downsample_3(x2_residual_connection, training)

@@ -1,10 +1,6 @@
 import orbax.checkpoint as ocp
-import jax
-import jax.numpy as jnp
-from scipy.optimize import direct
-
-from generator import Generator
-from discriminator import Discriminator
+from .generator import Generator
+from .discriminator import Discriminator
 import optax
 from flax import nnx
 
@@ -24,7 +20,7 @@ class Pix2Pix(nnx.Module):
 			self.discriminator_optimizer = nnx.Optimizer(self.discriminator, optax.adam(1e-4))
 
 	def __call__(self, x, training: bool = True):
-		return self.generator(x, training), self.discriminator(x, training)
+		return self.generator(x, training), self.discriminator(self.generator(x, training), training)
 
 	def generate(self, x, training: bool = False):
 		return self.generator(x, training)
